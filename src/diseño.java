@@ -41,7 +41,11 @@ public class diseño extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    MostrarInformacion();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
     }
@@ -111,54 +115,28 @@ public class diseño extends JFrame{
     //metodo cisualizar informacion
 
     public void MostrarInformacion() throws SQLException {
-        //llamo a la funcion para que venga
-        //primero se hace la conexion antes de realizar cualquier consulta
-        Connection conecta=conexion();
+        //para cuando yo ingrese en mi formulario
         String nombre=nom.getText();
-        String edad=eda.getText();
+        Connection conectado1=conexion();
+        String sql="Select * from estudiante where nombre=?";
 
-        //Lo que pidio
-        String nota1=n1.getText();
-        String nota2=n2.getText();
-
-        //Lo que la ing pidio
-        String sql="insert into estudiante(nombre,edad,nota1,nota2) values (?,?,?,?)";
-
-
-
-
-
-        // iMP
-        // PreparedStatement SIRVE PARA enviar sentrencias SQl a la base de datos
-        //Guardamos la informacion que se agrega en el JTexfiel en la base de datos
-        //Creo una instancia pstmt para conectar a la bdd
-        //                                        sql = "la consulta que hago"
-
-        PreparedStatement pstmt=conecta.prepareStatement(sql);
-
-        // siempre con un set(String - Int depende de que tipo de datos es en mi bdd) ,
-        // el numero cambia de acuerdo a la cantidad de datos que tengo
+        PreparedStatement pstmt=conectado1.prepareStatement(sql);
+        //para que se muestre
         pstmt.setString(1,nombre);
-        //pstmt.setString(2,edad); ahi no esta converitdo
-        //como necesitamos convertirlo a entero usamos;
-        pstmt.setInt(2,Integer.parseInt(edad));
-
-        //LO QUE LA ING PIDIO
-        pstmt.setDouble(3,Double.parseDouble(nota1));
-        pstmt.setDouble(4,Double.parseDouble(nota2));
-
-        //Explicacion de esto
-        // Ir fila por fila y agregarlo a la bdd
-        //Me pone un registro debajo de otro
-        int rowsAffect=pstmt.executeUpdate();
-        //Este hace que se valla bajando
-        if (rowsAffect>0){
-            JOptionPane.showMessageDialog(null,"Registro insertado correctamente");
+        //traer informacion d ela base de datos
+        ResultSet rs=pstmt.executeQuery();
+        if (rs.next()){
+            //pasamos la informacion y la pasamos a edad
+            String edad=rs.getString("edad"); // columna que voy a traer de la base de datos
+            JOptionPane.showMessageDialog(null,"Nombre"+nombre+"Edad "+edad);
         }
-        //cerramos la base de datos
-        pstmt.close();
         //cerramos la conexion
-        conecta.close();
+        rs.close();
+        //cerramos
+        pstmt.close();
+
+        //cerramos
+        conectado1.close();
 
 
     }
